@@ -35,15 +35,16 @@ class NeRFNetwork(NeRFRenderer):
 
         super().__init__(opt)
 
-        # grid
-        self.grid_encoder, self.grid_in_dim = get_encoder("hashgrid", input_dim=3, level_dim=2, num_levels=16, log2_hashmap_size=19, desired_resolution=2048 * self.bound)
+        # grid: use real bound defined in NeRFRenderer
+        self.grid_encoder, self.grid_in_dim = get_encoder("hashgrid", input_dim=3, level_dim=2, num_levels=16, log2_hashmap_size=19, desired_resolution=2048 * self.real_bound)
         self.grid_mlp = MLP(self.grid_in_dim, 1 + 15, 64, 3, bias=False)
 
         # view-dependency
         self.view_encoder, self.view_in_dim = get_encoder('sh', input_dim=3, degree=4)
         self.view_mlp = MLP(15 + self.view_in_dim, 3, 32, 3, bias=False)
 
-        # proposal network
+        # proposal network: it is default to use when no use of cuda_ray, try to exclude it
+    
         if not self.opt.cuda_ray:
             self.prop_encoders = nn.ModuleList()
             self.prop_mlp = nn.ModuleList()
@@ -58,10 +59,12 @@ class NeRFNetwork(NeRFRenderer):
             prop1_mlp = MLP(prop1_in_dim, 1, 16, 2, bias=False)
             self.prop_encoders.append(prop1_encoder)
             self.prop_mlp.append(prop1_mlp)
+        
 
 
     def common_forward(self, x):
 
+        #forward grid only within bound
         f = self.grid_encoder(x, bound=self.bound)
         f = self.grid_mlp(f)
 
@@ -117,10 +120,12 @@ class NeRFNetwork(NeRFRenderer):
             {'params': self.view_mlp.parameters(), 'lr': lr}, 
         ])
 
+        
         if not self.opt.cuda_ray:
             params.extend([
                 {'params': self.prop_encoders.parameters(), 'lr': lr},
                 {'params': self.prop_mlp.parameters(), 'lr': lr},
             ])
-
+        
+        
         return params

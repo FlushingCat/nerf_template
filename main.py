@@ -1,7 +1,8 @@
 import torch
 import argparse
 
-from nerf.gui import NeRFGUI
+#from nerf.gui import NeRFGUI
+#never use visualization
 from nerf.utils import *
 
 # torch.autograd.set_detect_anomaly(True)
@@ -33,6 +34,7 @@ if __name__ == '__main__':
     parser.add_argument('--downscale', type=int, default=1, help="downscale training images")
     parser.add_argument('--bound', type=float, default=2, help="assume the scene is bounded in box[-bound, bound]^3, if > 1, will invoke adaptive ray marching.")
     parser.add_argument('--scale', type=float, default=-1, help="scale camera location into box[-bound, bound]^3, -1 means automatically determine based on camera poses..")
+    #what does the offset mean
     parser.add_argument('--offset', type=float, nargs='*', default=[0, 0, 0], help="offset of camera location")
     parser.add_argument('--enable_cam_near_far', action='store_true', help="colmap mode: use the sparse points to estimate camera near far per view.")
     parser.add_argument('--enable_cam_center', action='store_true', help="use camera center instead of sparse point center (colmap dataset only)")
@@ -40,6 +42,8 @@ if __name__ == '__main__':
     parser.add_argument('--T_thresh', type=float, default=1e-4, help="minimum transmittance to continue ray marching")
 
     ### training options
+    parser.add_argument('--train_bound', type=float, default=2, help="the bound of the grid which got trained")
+
     parser.add_argument('--iters', type=int, default=20000, help="training iters")
     parser.add_argument('--lr', type=float, default=1e-2, help="initial learning rate")
     parser.add_argument('--cuda_ray', action='store_true', help="use CUDA raymarching instead of pytorch")

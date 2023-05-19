@@ -146,13 +146,14 @@ class NeRFRenderer(nn.Module):
         self.opt = opt
 
         # bound for ray marching (world space)
+        # here the real_bound and the train_bound can be seperated
         self.real_bound = opt.bound
 
         # bound for grid querying
         if self.opt.contract:
             self.bound = 2
         else:
-            self.bound = opt.bound
+            self.bound = opt.train_bound
         
         self.cascade = 1 + math.ceil(math.log2(self.bound))
 
