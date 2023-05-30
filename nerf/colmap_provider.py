@@ -450,8 +450,19 @@ class ColmapDataset:
         return results
 
     def dataloader(self):
-        size = len(self.poses)
-        loader = DataLoader(list(range(size)), batch_size=1, collate_fn=self.collate, shuffle=self.training, num_workers=0)
+        #size = len(self.poses)
+
+        total_size = len(self.poses)/self.opt.data_split
+
+        level = self.opt.current_split
+
+        level_start = int((level - 1)  * total_size)
+
+        level_end = int(level * total_size)
+
+        print("total_size:", total_size, "current_level:", level,"level_start:", level_start, "level_end:", level_end)
+
+        loader = DataLoader(list(range(level_start, level_end)), batch_size=1, collate_fn=self.collate, shuffle=self.training, num_workers=0)
         loader._data = self # an ugly fix... we need to access error_map & poses in trainer.
         loader.has_gt = self.images is not None
         return loader

@@ -34,6 +34,9 @@ if __name__ == '__main__':
     parser.add_argument('--downscale', type=int, default=1, help="downscale training images")
     parser.add_argument('--bound', type=float, default=2, help="assume the scene is bounded in box[-bound, bound]^3, if > 1, will invoke adaptive ray marching.")
     parser.add_argument('--scale', type=float, default=-1, help="scale camera location into box[-bound, bound]^3, -1 means automatically determine based on camera poses..")
+
+    parser.add_argument('--data_split', type=int, default=1)
+    parser.add_argument('--current_split', type=int, default=1)
     #what does the offset mean
     parser.add_argument('--offset', type=float, nargs='*', default=[0, 0, 0], help="offset of camera location")
     parser.add_argument('--enable_cam_near_far', action='store_true', help="colmap mode: use the sparse points to estimate camera near far per view.")
@@ -102,9 +105,9 @@ if __name__ == '__main__':
     
     if opt.O2:
         opt.fp16 = True
-        opt.bound = 128 # large enough
+        #opt.bound = 128 # large enough
         opt.preload = True
-        opt.contract = True
+        #opt.contract = True
         opt.adaptive_num_rays = True
         opt.random_image_batch = True
     
